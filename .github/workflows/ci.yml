@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y jq
+        curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o yq
+        sudo chmod +x yq
+        sudo mv yq /usr/local/bin/
+    
+    - name: Run tests
+      run: go test -v ./...
+    
+    - name: Build
+      run: go build -v ./cmd/xq-ui/
+    
+    - name: Test binary
+      run: ./xq-ui --help
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+    
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: latest

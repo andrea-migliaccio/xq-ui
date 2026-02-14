@@ -1,0 +1,10 @@
+*.log
+debug.log
+xq-ui
+dist/
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

@@ -1,0 +1,134 @@
+# Goreleaser configuration for xq-ui
+version: 2
+
+project_name: xq-ui
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: xq-ui
+    main: ./cmd/xq-ui/main.go
+    binary: xq-ui
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+
+archives:
+  - id: default
+    builds:
+      - xq-ui
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  use: github
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: 'Bug fixes'
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 'Performance improvements'
+      regexp: '^.*?perf(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: Others
+      order: 999
+
+release:
+  github:
+    owner: andrea-migliaccio
+    name: xq-ui
+  draft: false
+  prerelease: auto
+  mode: replace
+  header: |
+    ## XQ-UI {{ .Tag }}
+    
+    Interactive TUI Playground for yq and jq with AI-powered query generation.
+    
+    ### Installation
+    
+    Download the appropriate binary for your system from the assets below.
+    
+    **Linux/macOS:**
+    ```bash
+    curl -sSL https://github.com/andrea-migliaccio/xq-ui/releases/download/{{ .Tag }}/xq-ui_{{ .Version }}_linux_amd64.tar.gz | tar -xz
+    sudo mv xq-ui /usr/local/bin/
+    ```
+    
+    **Or use the install script:**
+    ```bash
+    curl -sSL https://raw.githubusercontent.com/andrea-migliaccio/xq-ui/main/install.sh | bash
+    ```
+  footer: |
+    ### Requirements
+    
+    - `jq` and/or `yq` installed on your system
+    - Optional: `OPENAI_API_KEY` for AI features
+    
+    ---
+    **Full Changelog**: https://github.com/andrea-migliaccio/xq-ui/compare/{{ .PreviousTag }}...{{ .Tag }}
+
+brews:
+  - name: xq-ui
+    repository:
+      owner: andrea-migliaccio
+      name: homebrew-tap
+    folder: Formula
+    homepage: "https://github.com/andrea-migliaccio/xq-ui"
+    description: "Interactive TUI Playground for yq and jq with AI-powered query generation"
+    license: "MIT"
+    test: |
+      system "#{bin}/xq-ui --help"
+    install: |
+      bin.install "xq-ui"
+
+nfpms:
+  - id: packages
+    package_name: xq-ui
+    file_name_template: "{{ .ConventionalFileName }}"
+    vendor: Your Name
+    homepage: "https://github.com/andrea-migliaccio/xq-ui"
+    maintainer: "Your Name <your.email@example.com>"
+    description: "Interactive TUI Playground for yq and jq with AI-powered query generation"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+      - apk
+    bindir: /usr/bin
+    contents:
+      - src: ./README.md
+        dst: /usr/share/doc/xq-ui/README.md
+      - src: ./LICENSE
+        dst: /usr/share/doc/xq-ui/LICENSE
