@@ -99,25 +99,11 @@ release:
     ---
     **Full Changelog**: https://github.com/andrea-migliaccio/xq-ui/compare/{{ .PreviousTag }}...{{ .Tag }}
 
-brews:
-  - name: xq-ui
-    repository:
-      owner: andrea-migliaccio
-      name: homebrew-tap
-    directory: Formula
-    homepage: "https://github.com/andrea-migliaccio/xq-ui"
-    description: "Interactive TUI Playground for yq and jq with AI-powered query generation"
-    license: "MIT"
-    test: |
-      system "#{bin}/xq-ui --help"
-    install: |
-      bin.install "xq-ui"
-
 nfpms:
   - id: packages
     package_name: xq-ui
     file_name_template: "{{ .ConventionalFileName }}"
-    vendor: Your Name
+    vendor: Andrea Migliaccio
     homepage: "https://github.com/andrea-migliaccio/xq-ui"
     maintainer: "Your Name <your.email@example.com>"
     description: "Interactive TUI Playground for yq and jq with AI-powered query generation"
