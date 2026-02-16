@@ -1,6 +1,6 @@
 *.log
 debug.log
-xq-ui
+/xq-ui
 dist/
 .DS_Store
 .vscode/
