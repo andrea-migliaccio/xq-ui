@@ -6,7 +6,7 @@ import (
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/yourusername/xq-ui/internal/tui"
+	"github.com/andrea-migliaccio/xq-ui/internal/tui"
 )
 
 // Version information (set by ldflags during build)
