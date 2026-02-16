@@ -104,7 +104,7 @@ brews:
     repository:
       owner: andrea-migliaccio
       name: homebrew-tap
-    folder: Formula
+    directory: Formula
     homepage: "https://github.com/andrea-migliaccio/xq-ui"
     description: "Interactive TUI Playground for yq and jq with AI-powered query generation"
     license: "MIT"
