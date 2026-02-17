@@ -235,6 +235,55 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 
+	case tea.MouseMsg:
+		if msg.Type == tea.MouseLeft {
+			// Calculate panel positions based on layout
+			queryPanelHeight := 6 // Same as in View()
+			if m.height < 20 {
+				queryPanelHeight = 4
+			}
+			
+			statusBarHeight := 3
+			spacingHeight := 2
+			remainingHeight := m.height - queryPanelHeight - statusBarHeight - spacingHeight
+			if remainingHeight < 8 {
+				remainingHeight = 8
+				queryPanelHeight = m.height - remainingHeight - statusBarHeight - spacingHeight
+				if queryPanelHeight < 4 {
+					queryPanelHeight = 4
+				}
+			}
+			
+			panelWidth := (m.width - 6) / 2
+			if panelWidth < 20 {
+				panelWidth = 20
+			}
+			
+			// Determine which panel was clicked
+			clickY := msg.Y
+			clickX := msg.X
+			
+			if clickY < queryPanelHeight {
+				// Clicked in query panel
+				if m.currentPanel != QueryPanel {
+					m.setActivePanel(QueryPanel)
+				}
+			} else if clickY < queryPanelHeight + remainingHeight {
+				// Clicked in bottom panels area
+				if clickX < panelWidth + 2 {
+					// Clicked in input panel (left)
+					if m.currentPanel != InputPanel {
+						m.setActivePanel(InputPanel)
+					}
+				} else {
+					// Clicked in output panel (right)
+					if m.currentPanel != OutputPanel {
+						m.setActivePanel(OutputPanel)
+					}
+				}
+			}
+		}
+
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c":
@@ -507,6 +556,30 @@ func (m *Model) prevPanel() {
 	case OutputPanel:
 		m.currentPanel = InputPanel
 		m.inputArea.Focus()
+	}
+}
+
+// setActivePanel switches focus to the specified panel
+func (m *Model) setActivePanel(panel Panel) {
+	// Blur current panel
+	switch m.currentPanel {
+	case QueryPanel:
+		m.queryInput.Blur()
+	case InputPanel:
+		m.inputArea.Blur()
+	case OutputPanel:
+		// Output panel doesn't need blur (viewport)
+	}
+	
+	// Set new panel and focus
+	m.currentPanel = panel
+	switch panel {
+	case QueryPanel:
+		m.queryInput.Focus()
+	case InputPanel:
+		m.inputArea.Focus()
+	case OutputPanel:
+		// Output panel doesn't need focus (viewport)
 	}
 }
 
